@@ -1,8 +1,6 @@
 #include <iostream>
 
 #include <bdlma_multipoolallocator.h>
-#include <bdlma_sequentialallocator.h>
-#include <bslma_newdeleteallocator.h>
 
 #include <bsl_vector.h>
 
@@ -11,7 +9,7 @@
 using namespace BloombergLP;
 
 int main() {
-  bdlma::SequentialPool allocator;
+  bdlma::Multipool allocator;
   bsl::vector<void *> active;
 
   for (int i = 0; i < N; ++i) {
