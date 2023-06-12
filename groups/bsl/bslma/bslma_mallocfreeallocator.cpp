@@ -105,6 +105,7 @@ MallocFreeAllocator& MallocFreeAllocator::singleton()
 // MANIPULATORS
 void *MallocFreeAllocator::allocate(size_type size)
 {
+    fprintf(stderr, "MallocFreeAllocator::allocate(%zd)\n", size);
     if (!size) {
         return 0;                                                     // RETURN
     }

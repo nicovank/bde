@@ -97,6 +97,7 @@ NewDeleteAllocator::~NewDeleteAllocator()
 // MANIPULATORS
 void *NewDeleteAllocator::allocate(size_type size)
 {
+    fprintf(stderr, "MallocFreeAllocator::allocate(%zd)\n", size);
     return 0 == size ? 0 : ::operator new(size);
 }
 

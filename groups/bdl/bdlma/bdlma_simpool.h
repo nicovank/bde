@@ -8,11 +8,9 @@
 #include <cstdlib>
 #include <iostream>
 
-#if defined(__APPLE__)
-#include <malloc/malloc.h>
-#else
-#include <malloc.h>
-#endif
+#include <bslma_mallocfreeallocator.h>
+
+using namespace BloombergLP;
 
 namespace {
 /**
@@ -118,7 +116,7 @@ public:
     // sz = align(sz);
     // Get an object of the requested size plus the header.
     auto *b =
-        reinterpret_cast<DLList::Entry *>(::malloc(sz + sizeof(DLList::Entry)));
+        reinterpret_cast<DLList::Entry *>(bslma::MallocFreeAllocator::singleton().allocate(sz + sizeof(DLList::Entry)));
     if (b) {
       // Update current size of the pool.
       if (_maxSize) {
@@ -134,7 +132,6 @@ public:
   }
 
   inline void *allocate(size_t sz) {
-    std::cout << "malloc(" << sz << ")" << std::endl;
     return malloc(sz);
   }
 
@@ -147,7 +144,7 @@ public:
       _size -= getSize(b);
     }
     // Free the object.
-    ::free(b);
+    bslma::MallocFreeAllocator::singleton().deallocate(b);
   }
 
   inline void deallocate(void *ptr) { free(ptr); }
@@ -158,7 +155,7 @@ public:
     // Iterate through the list, freeing each item.
     auto *e = _list.get();
     while (e) {
-      ::free(e);
+      bslma::MallocFreeAllocator::singleton().deallocate(e);
       e = _list.get();
     }
     _size = 0;
