@@ -1,11 +1,6 @@
 cmake_minimum_required(VERSION 3.19)
 project(bde)
 
-# We need to do this at the top-level to make sure we compile source files with the right header.
-if(DEFINED ENV{INTERPOSE})
-    include_directories(custom-experiments/interpose-include)
-endif()
-
 # BDE build system selector
 if (BBS_BUILD_SYSTEM)
     enable_testing()
