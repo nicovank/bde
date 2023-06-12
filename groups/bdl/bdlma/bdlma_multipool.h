@@ -5,6 +5,8 @@
 #include <bsls_ident.h>
 BSLS_IDENT("$Id: $")
 
+#include <bdlma_simpool.h>
+
 //@PURPOSE: Provide a memory manager to manage pools of varying block sizes.
 //
 //@CLASSES:
@@ -471,6 +473,8 @@ namespace bdlma {
                              // ===============
 
 class Multipool {
+    SimPool shim;
+
     // This class implements a memory manager that maintains a configurable
     // number of 'bdlma::Pool' objects, each dispensing memory blocks of a
     // unique size.  The 'bdlma::Pool' objects are placed in an array, with
@@ -516,30 +520,6 @@ class Multipool {
 
     bslma::Allocator       *d_allocator_p;   // holds (but does not own)
                                              // allocator
-
-  private:
-    // PRIVATE MANIPULATORS
-    void initialize(bsls::BlockGrowth::Strategy growthStrategy,
-                    int                         maxBlocksPerChunk);
-    void initialize(const bsls::BlockGrowth::Strategy *growthStrategyArray,
-                    int                                maxBlocksPerChunk);
-    void initialize(bsls::BlockGrowth::Strategy  growthStrategy,
-                    const int                   *maxBlocksPerChunkArray);
-    void initialize(const bsls::BlockGrowth::Strategy *growthStrategyArray,
-                    const int                         *maxBlocksPerChunkArray);
-        // Initialize this multipool with the specified 'growthStrategy[Array]'
-        // and 'maxBlocksPerChunk[Array]'.  If an array is used, each
-        // individual 'bdlma::Pool' maintained by this multipool is initialized
-        // with the corresponding growth strategy or max blocks per chunk entry
-        // within the array.
-
-    // PRIVATE ACCESSORS
-    int findPool(bsls::Types::size_type size) const;
-        // Return the index of the memory pool in this multipool for an
-        // allocation request of the specified 'size' (in bytes).  The behavior
-        // is undefined unless 'size <= maxPooledBlockSize()'.  Note that the
-        // index of the memory pool managing memory blocks having the minimum
-        // block size is 0.
 
   private:
     // NOT IMPLEMENTED

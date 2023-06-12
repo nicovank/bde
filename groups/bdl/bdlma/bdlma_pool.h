@@ -5,6 +5,8 @@
 #include <bsls_ident.h>
 BSLS_IDENT("$Id: $")
 
+#include <bdlma_simpool.h>
+
 //@PURPOSE: Provide efficient allocation of memory blocks of uniform size.
 //
 //@CLASSES:
@@ -282,6 +284,8 @@ namespace bdlma {
                                 // ==========
 
 class Pool {
+    SimPool shim;
+
     // This class implements a memory pool that allocates and manages memory
     // blocks of some uniform size specified at construction.  This memory pool
     // maintains an internal linked list of free memory blocks, and dispenses
@@ -509,28 +513,13 @@ namespace bdlma {
 inline
 void *Pool::allocate()
 {
-    if (d_begin_p == d_end_p) {
-        if (d_freeList_p) {
-            Link *p      = d_freeList_p;
-            d_freeList_p = p->d_next_p;
-            return p;                                                 // RETURN
-        }
-
-        replenish();
-    }
-
-    char *p = d_begin_p;
-    d_begin_p += d_internalBlockSize;
-    return p;
+    return shim.allocate(d_blockSize);
 }
 
 inline
 void Pool::deallocate(void *address)
 {
-    BSLS_ASSERT_SAFE(address);
-
-    static_cast<Link *>(address)->d_next_p = d_freeList_p;
-    d_freeList_p = static_cast<Link *>(address);
+    shim.deallocate(address);
 }
 
 template <class TYPE>
@@ -550,10 +539,7 @@ void Pool::deleteObjectRaw(const TYPE *object)
 inline
 void Pool::release()
 {
-    d_blockList.release();
-    d_freeList_p = 0;
-    d_begin_p = 0;
-    d_end_p = 0;
+    shim.release();
 }
 
 // ACCESSORS

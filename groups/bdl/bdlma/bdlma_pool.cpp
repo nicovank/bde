@@ -51,25 +51,7 @@ bsls::Types::size_type roundUp(bsls::Types::size_type x,
                                 // ----------
 
 // PRIVATE MANIPULATORS
-void Pool::replenish()
-{
-    d_begin_p = static_cast<char *>(d_blockList.allocate(d_chunkSize
-                                                       * d_internalBlockSize));
-    d_end_p = d_begin_p + d_chunkSize * d_internalBlockSize;
-
-    if (   bsls::BlockGrowth::BSLS_GEOMETRIC == d_growthStrategy
-        && d_chunkSize < d_maxBlocksPerChunk) {
-
-        if (BSLS_PERFORMANCEHINT_PREDICT_LIKELY(
-                       d_chunkSize * k_GROWTH_FACTOR <= d_maxBlocksPerChunk)) {
-            d_chunkSize = d_chunkSize * k_GROWTH_FACTOR;
-        }
-        else {
-            BSLS_PERFORMANCEHINT_UNLIKELY_HINT;
-            d_chunkSize = d_maxBlocksPerChunk;
-        }
-    }
-}
+void Pool::replenish() {}
 
 // CREATORS
 Pool::Pool(bsls::Types::size_type blockSize, bslma::Allocator *basicAllocator)
@@ -137,43 +119,7 @@ Pool::~Pool()
 }
 
 // MANIPULATORS
-void Pool::reserveCapacity(int numBlocks)
-{
-    BSLS_ASSERT(0 <= numBlocks);
-
-    Link *p = d_freeList_p;
-    while (p && numBlocks > 0) {
-        p = p->d_next_p;
-        --numBlocks;
-    }
-
-    if (numBlocks > 0 && d_end_p == d_begin_p) {
-        d_begin_p = static_cast<char *>(d_blockList.allocate(numBlocks
-                                                       * d_internalBlockSize));
-        d_end_p = d_begin_p + numBlocks * d_internalBlockSize;
-        return;                                                       // RETURN
-    }
-
-    numBlocks -= static_cast<int>((d_end_p - d_begin_p) / d_internalBlockSize);
-
-    if (numBlocks > 0) {
-
-        // Allocate memory and add its blocks to the free list.
-
-        void *blocks = d_blockList.allocate(numBlocks * d_internalBlockSize);
-        char *p = static_cast<char *>(blocks);
-        for (int i = 1; i < numBlocks; ++i) {
-            Link *plink = static_cast<Link *>(static_cast<void *>(p));
-            p += d_internalBlockSize;
-            Link *pnext = static_cast<Link *>(static_cast<void *>(p));
-            plink->d_next_p = pnext;
-        }
-
-        Link *pend = static_cast<Link *>(static_cast<void *>(p));
-        pend->d_next_p = d_freeList_p;
-        d_freeList_p = static_cast<Link *>(blocks);
-    }
-}
+void Pool::reserveCapacity(int numBlocks) {}
 
 }  // close package namespace
 }  // close enterprise namespace
